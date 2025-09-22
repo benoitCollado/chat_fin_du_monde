@@ -1,14 +1,14 @@
 ## Registre
 
 ````bash
-  http://0.0.0.0:8000/auth/register
+POST:  http://0.0.0.0:8000/auth/register
 
 JSON : {"username": "alice", "password": "s3cret"}
 ````
 
-## Authentication 
+## Authentication
 ````bash
-  http://localhost:8000/auth/login
+POST:  http://localhost:8000/auth/login
 
 JSON : {"username": "alice", "password": "s3cret"}
 JSON : {
@@ -20,7 +20,7 @@ JSON : {
 
 ## Me
 ````bash
-  http://localhost:8000/auth/me
+GET:  http://localhost:8000/auth/me
   
 Autorization Bearer Token
 
@@ -29,11 +29,19 @@ JSON : {"username": "alice", "password": "s3cret"}
 
 ## Messages
 ````bash
-  http://localhost:8000/rooms/local/messages
+POST  http://localhost:8000/rooms/local/messages
   
 Autorization Bearer Token
 
 BODY JSON : {"content":"hi"}
 ````
 
+## de chiffre Messages
+````bash
+POST  http://localhost:8000/rooms/local/messages
+  
+Autorization Bearer Token
+
+BODY JSON 
+````
 

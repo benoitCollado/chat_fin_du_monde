@@ -1,10 +1,14 @@
 from __future__ import annotations
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
 from typing import Generator
 from .config import DATABASE_URL
 
-# Création du moteur SQLAlchemy (avec option spéciale pour SQLite)
+# Création du moteur SQLAlchemy
+# - future=True = nouvelle API
+# - echo=False = pas de log SQL (mettre True en debug)
+# - check_same_thread=False = obligatoire pour SQLite en mode multi-threads
 engine = create_engine(
     DATABASE_URL,
     future=True,
@@ -12,15 +16,20 @@ engine = create_engine(
     connect_args={"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {},
 )
 
-# Fabrique de sessions (une par requête HTTP)
-SessionLocal = sessionmaker(bind=engine, expire_on_commit=False, autoflush=False)
+# Fabrique de sessions : une session par requête HTTP
+SessionLocal = sessionmaker(
+    bind=engine,
+    expire_on_commit=False,  # garde les objets utilisables après commit
+    autoflush=False,
+)
 
+# Classe de base pour tous les modèles ORM
 class Base(DeclarativeBase):
     """Base déclarative dont héritent tous les modèles ORM."""
     pass
 
+# Dépendance FastAPI : ouvre/ferme une session DB par requête
 def get_db() -> Generator:
-    """ Dépendance FastAPI : ouvre une session DB par requête et la referme proprement."""
     db = SessionLocal()
     try:
         yield db
