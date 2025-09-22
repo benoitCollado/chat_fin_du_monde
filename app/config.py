@@ -6,8 +6,13 @@ SECRET_KEY: str = os.getenv("SECRET_KEY", "dev-secret-change-me")
 ALGORITHM: str = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_MIN", "15"))
 
-# Chaîne de connexion DB (SQLite local par défaut)
-DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./offcom.db")
+# 🇫🇷 Dossier "data" au même niveau que "app"
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATA_DIR = os.path.join(BASE_DIR, "data")
+os.makedirs(DATA_DIR, exist_ok=True)  # crée le dossier si inexistant
+
+# 🇫🇷 Fichier SQLite placé dans ./data/offcom.db
+DATABASE_URL: str = os.getenv("DATABASE_URL", f"sqlite:///{os.path.join(DATA_DIR, 'offcom.db')}")
 
 # CORS (en dev on autorise tout, à restreindre en prod)
 CORS_ALLOW_ORIGINS = os.getenv("CORS_ALLOW_ORIGINS", "*").split(",")
