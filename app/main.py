@@ -12,6 +12,9 @@ from .routers import auth as auth_router
 from .routers import messages as messages_router
 from .routers import connections as connections_router
 
+import logging
+logging.getLogger("passlib").setLevel(logging.ERROR)
+
 app = FastAPI(title="OffCom Backend", version="0.1.0", description="Backend minimal (offline-first) pour utilisateurs, messages et connexions")
 
 # CORS permissif pour le dev ( restreindre en prod)
