@@ -118,18 +118,3 @@ DELETE /admin/users/{id}
 Header: Authorization: Bearer <admin_token>
 ```
 
----
-
-## Astuce Postman
-
-* Crée une **Collection Postman** avec des dossiers :
-
-  * `Auth`
-  * `Messagerie`
-  * `Admin`
-* Utilise une variable `{{token}}` dans Postman pour stocker ton `Bearer Token`.
-* Comme ça, pas besoin de copier-coller le token à chaque fois.
-
----
-
-Veux-tu que je te prépare un **fichier JSON de Collection Postman** prêt à importer (tu cliques → tu as déjà toutes les requêtes dedans) ?
