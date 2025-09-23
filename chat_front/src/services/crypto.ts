@@ -1,6 +1,6 @@
 import nacl from "tweetnacl";
 import * as naclUtil from "tweetnacl-util";
-import { hammingEncode, hammingDecode } from "./hamming.js";
+import { hammingEncode, hammingDecode } from "./ECC";
 
 // ---------- Helpers Base64 ----------
 const b64 = {
