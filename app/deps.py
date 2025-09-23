@@ -9,6 +9,9 @@ from .models import User
 from jwt import decode as jwt_decode
 from .config import SECRET_KEY, ALGORITHM
 
+# Dépendance: exige un admin
+from fastapi import Depends, HTTPException, status
+
 def get_user_by_username(db: Session, username: str) -> Optional[User]:
     """ Récupère un utilisateur par son nom (helper partagé)."""
     return db.query(User).filter(User.username == username).first()
@@ -31,3 +34,9 @@ def get_current_user(
     if payload.get("ver", 0) != getattr(user, "token_version", 0):
         raise HTTPException(status_code=401, detail="Jeton révoqué")
     return user
+
+def require_admin(current: User = Depends(get_current_user)) -> User:
+    """Autorise uniquement les administrateurs."""
+    if not current.is_admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin only")
+    return current

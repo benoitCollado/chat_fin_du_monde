@@ -1,13 +1,3 @@
-# app/main.py
-# ─────────────────────────────────────────────────────────────────────────────
-# 🇫🇷 Point d'entrée FastAPI de l'application OffCom
-# - Instancie l'application
-# - Monte (optionnel) les fichiers statiques /ui
-# - Branche les routeurs (auth, messages, connections)
-# - Crée les tables au démarrage
-# - Lance une tâche de fond qui purge les messages trop anciens (TTL)
-# ─────────────────────────────────────────────────────────────────────────────
-
 from __future__ import annotations
 
 import os
@@ -33,6 +23,7 @@ from .routers import messages as messages_router
 from .routers import connections as connections_router
 from .routers import users as users_router
 from .routers import dm as dm_router
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Création de l'application FastAPI

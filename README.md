@@ -1,47 +1,135 @@
-## Registre
+# Plan de test API (Postman)
 
-````bash
-POST:  http://0.0.0.0:8000/auth/register
+## Authentification
 
-JSON : {"username": "alice", "password": "s3cret"}
-````
+1. **Inscription (nouvel utilisateur)**
 
-## Authentication
-````bash
-POST:  http://localhost:8000/auth/login
+   ```
+   POST /auth/register
+   Corps (JSON): 
+   {
+     "username": "Alice",
+     "password": "secret123"
+   }
+   ```
 
-JSON : {"username": "alice", "password": "s3cret"}
-JSON : {
-    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhbGljZSIsInZlciI6MCwianRpIjoiYWE2NzkyMWYtOTc5NS00YjIwLWJkNmQtZDFmNGFhN2E2N2IxIiwiaWF0IjoxNzU4NTQzODQ4LCJleHAiOjE3NTg1NDQ3NDh9.NkrmgYX80Qboxh2TwgMH6srWjJmWpIuMo6Y__FpGQ50",
-    "token_type": "bearer",
-    "expires_in": 15
-}
-````
+   ✅ Retourne : `id`, `username`, `created_at`.
 
-## Me
-````bash
-GET:  http://localhost:8000/auth/me
-  
-Autorization Bearer Token
+2. **Connexion (login)**
 
-JSON : {"username": "alice", "password": "s3cret"}
-````
+   ```
+   POST /auth/login
+   Corps (JSON): 
+   {
+     "username": "Alice",
+     "password": "secret123"
+   }
+   ```
 
-## Messages
-````bash
-POST  http://localhost:8000/rooms/local/messages
-  
-Autorization Bearer Token
+   ✅ Retourne : `access_token`.
+   👉 Copie ce token et mets-le dans Postman → **Authorization → Bearer Token**.
 
-BODY JSON : {"content":"hi"}
-````
+3. **Mon profil**
 
-## de chiffre Messages
-````bash
-POST  http://localhost:8000/rooms/local/messages
-  
-Autorization Bearer Token
+   ```
+   GET /auth/me
+   Header: Authorization: Bearer <token>
+   ```
 
-BODY JSON 
-````
+   ✅ Retourne : `id`, `username`, `is_admin`.
 
+---
+
+## Messagerie
+
+4. **Lister les utilisateurs (pour voir qui existe)**
+
+   ```
+   GET /users
+   Header: Authorization: Bearer <token>
+   ```
+
+   ✅ Retourne la liste de tous les utilisateurs (sauf toi-même).
+
+5. **Ouvrir une discussion privée (DM)**
+
+   ```
+   POST /dm/open
+   Header: Authorization: Bearer <token>
+   Corps (JSON):
+   {
+     "peer_username": "Bob"
+   }
+   ```
+
+   ✅ Retourne `room_id` (exemple : `alice:bob`).
+
+6. **Envoyer un message**
+
+   ```
+   POST /rooms/{room_id}/messages
+   Header: Authorization: Bearer <token>
+   Corps (JSON):
+   {
+     "content": "Salut Bob"
+   }
+   ```
+
+   ✅ Retourne le message : `id`, `sender`, `content`, `created_at`.
+
+7. **Lire l’historique des messages**
+
+   ```
+   GET /rooms/{room_id}/messages
+   Header: Authorization: Bearer <token>
+   ```
+
+   ✅ Retourne la conversation (messages en clair via `safe_decrypt`).
+
+---
+
+## Administration (réservé aux admins / root)
+
+8. **Lister tous les utilisateurs**
+
+   ```
+   GET /admin/users
+   Header: Authorization: Bearer <admin_token>
+   ```
+
+9. **Donner les droits admin**
+
+   ```
+   POST /admin/users/{id}/promote
+   Header: Authorization: Bearer <admin_token>
+   ```
+
+10. **Retirer les droits admin**
+
+```
+POST /admin/users/{id}/demote
+Header: Authorization: Bearer <admin_token>
+```
+
+11. **Supprimer un utilisateur**
+
+```
+DELETE /admin/users/{id}
+Header: Authorization: Bearer <admin_token>
+```
+
+---
+
+## Astuce Postman
+
+* Crée une **Collection Postman** avec des dossiers :
+
+  * `Auth`
+  * `Messagerie`
+  * `Admin`
+* Utilise une variable `{{token}}` dans Postman pour stocker ton `Bearer Token`.
+* Comme ça, pas besoin de copier-coller le token à chaque fois.
+
+---
+
+Veux-tu que je te prépare un **fichier JSON de Collection Postman** prêt à importer (tu cliques → tu as déjà toutes les requêtes dedans) ?

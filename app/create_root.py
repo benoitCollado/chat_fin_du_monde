@@ -30,7 +30,7 @@ def main() -> None:
         # Crée le compte root avec privilèges admin
         root = User(
             username="root",
-            password_hash=get_password_hash("root"),  # changez le mot de passe ensuite
+            password_hash=get_password_hash("rootazerty"),  # changez le mot de passe ensuite
             is_admin=True,
         )
         db.add(root)
