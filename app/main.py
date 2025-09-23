@@ -31,7 +31,8 @@ from .config import CORS_ALLOW_ORIGINS, GLOBAL_MESSAGE_TTL_MIN
 from .routers import auth as auth_router
 from .routers import messages as messages_router
 from .routers import connections as connections_router
-
+from .routers import users as users_router
+from .routers import dm as dm_router
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Création de l'application FastAPI
@@ -57,7 +58,8 @@ app.add_middleware(
 app.include_router(auth_router.router, prefix="/auth", tags=["auth"])
 app.include_router(messages_router.router, prefix="/rooms", tags=["messages"])
 app.include_router(connections_router.router, prefix="/connections", tags=["connections"])
-
+app.include_router(users_router.router)
+app.include_router(dm_router.router, prefix="/dm")
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Optionnel : monter une petite UI statique si le dossier web/ existe

@@ -39,3 +39,21 @@ class ConnectionOut(BaseModel):
     transport: str
     address: str
     last_seen_at: datetime
+
+# Exposition publique d'un utilisateur (sans champs sensibles)
+class UserPublic(BaseModel):
+    id: int
+    username: str
+    is_admin: bool
+
+    class Config:
+        from_attributes = True
+
+# Requête pour ouvrir une DM
+class OpenDMRequest(BaseModel):
+    # on ouvre une DM par ID de destinataire
+    peer_id: int
+
+# Réponse contenant le room_id de la DM
+class OpenDMResponse(BaseModel):
+    room_id: str

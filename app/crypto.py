@@ -5,6 +5,7 @@
 from __future__ import annotations
 from cryptography.fernet import Fernet
 from .config import MESSAGE_KEY_FILE
+from cryptography.fernet import InvalidToken
 import os
 
 _FERNET: Fernet | None = None
@@ -34,3 +35,11 @@ def encrypt_text(plaintext: str) -> str:
 def decrypt_text(token_str: str) -> str:
     """ Déchiffre un token base64 (str) vers texte clair."""
     return _get_fernet().decrypt(token_str.encode("utf-8")).decode("utf-8")
+
+def safe_decrypt(token_str: str) -> str:
+    """Essaye de déchiffrer, retourne brut si erreur (compat ancien data)."""
+    try:
+        return decrypt_text(token_str)
+    except (InvalidToken, Exception):
+        # on renvoie le contenu brut si ce n'était pas du Fernet
+        return token_str
