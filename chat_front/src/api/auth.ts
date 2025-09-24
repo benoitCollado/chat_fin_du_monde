@@ -1,12 +1,12 @@
 // Tu remplaceras par des appels réels avec fetch ou axios
-export async function loginUser(email: string, password: string) {
+export async function loginUser(username: string, password: string) {
 
-      const res = await fetch("http://localhost:8000/login", {
+      const res = await fetch("http://localhost:8000/auth/login", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ email: email, password: password }),
+    body: JSON.stringify({ username: username, password: password }),
         })
 
     if(!res.ok){
@@ -22,12 +22,15 @@ export async function loginUser(email: string, password: string) {
     }
 }
 
-export async function registerUser(email: string, password:string){
-    const res = await fetch("http://localhost:8000/register", {
+export async function registerUser(username: string, password:string){
+    const res = await fetch("http://localhost:8000/auth/register", {
         method:"POST",
+         headers: {
+            "Content-Type": "application/json" // ✅ indique que c'est du JSON
+        },
         body: JSON.stringify({
-            email: email,
-            password : password
+            username: username,
+            password: password
         })
     })
 

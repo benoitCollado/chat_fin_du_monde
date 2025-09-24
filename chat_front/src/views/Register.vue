@@ -2,7 +2,7 @@
   <div class="max-w-sm mx-auto mt-10 p-4 border rounded-lg">
     <h1 class="text-2xl font-bold mb-4">Inscription</h1>
     <form @submit.prevent="handleRegister">
-      <input v-model="email" type="email" placeholder="Email" class="border p-2 w-full mb-2" />
+      <input v-model="username" type="text" placeholder="username" class="border p-2 w-full mb-2" />
       <input v-model="password" type="password" placeholder="Mot de passe" class="border p-2 w-full mb-2" />
       <input v-model="confirm" type="password" placeholder="Confirmer le mot de passe" class="border p-2 w-full mb-4" />
       <button class="bg-green-600 text-white px-4 py-2 rounded w-full">
@@ -19,19 +19,25 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { registerUser } from '../api/auth'
 
-const email = ref('')
+const username = ref('')
 const password = ref('')
 const confirm = ref('')
 const router = useRouter()
 
 async function handleRegister() {
   if (password.value !== confirm.value) {
-    alert('Les mots de passe ne correspondent pas')
-    return
+    alert('Les mots de passe ne correspondent pas');
+    return;
   }
-  // Appel API d'inscription ici...
-  alert('Compte créé, vous pouvez vous connecter')
-  router.push('/login')
+  try{
+    const res = await registerUser(username.value, password.value);
+    alert('Compte créé, vous pouvez vous connecter');
+    router.push('/login');
+  }catch{
+    alert('La création du mot de passe a échouée');
+  }
+  
 }
 </script>

@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { loginUser, registerUser } from '../api/auth'
+import { useIdentityStore } from './identity'
 
 export const useAuthStore = defineStore('auth', () => {
   // --- State ---
@@ -9,7 +10,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   // --- Getters ---
   const isAuthenticated = computed(() => {
-    if(!!access_token.value || !!expiresAt.value){
+    if(!expiresAt.value){
         return false
     }
     return !!access_token.value && Date.now() < expiresAt.value
@@ -20,6 +21,9 @@ export const useAuthStore = defineStore('auth', () => {
     try{
         const { access_token , expiresAt } = await loginUser(email, password)
         setSession(access_token, expiresAt)
+        const identity = useIdentityStore();
+        console.log("on appelle la fonction pour créer ou récupérer les clés");
+        identity.saveKeysLocal();
     }catch{
         console.log("impossible de se connecter");
     }
@@ -36,7 +40,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   function logout() {
     access_token.value = ""
-    expiresAt.value = Date.now()
+    expiresAt.value = 0
   }
 
   function setSession(newToken: string, newExpiresAt: number) {

@@ -1,6 +1,8 @@
 import nacl from "tweetnacl";
 import * as naclUtil from "tweetnacl-util";
 import { hammingEncode, hammingDecode } from "./ECC";
+import { WrongPasswordError, IdentityAlreadyExistError, NoIdentity } from "../utils.ts/Errors";
+
 
 // ---------- Helpers Base64 ----------
 const b64 = {
@@ -24,7 +26,7 @@ export interface WirePayload {
 }
 
 // ---------- Génération identité persistante ----------
-export function generateIdentity(): Identity {
+export async function generateIdentity(): Promise<Identity> {
   const sign = nacl.sign.keyPair();
   const dh = nacl.box.keyPair();
   return {
@@ -90,10 +92,80 @@ export function decryptFromSender(
   return naclUtil.encodeUTF8(plaintext);
 }
 
-// ---------- Sérialisation identités ----------
+// --- Sérialisation identités ---
 export const serializeIdentity = (id: Identity) => ({
   signPub: b64.enc(id.signPub),
   signPriv: b64.enc(id.signPriv),
   dhPub: b64.enc(id.dhPub),
   dhPriv: b64.enc(id.dhPriv),
 });
+
+
+// --- Création d'une clé à partir d'un mot de passe ---
+
+export function keyFromPassword( password: string): Uint8Array {
+  //Hash SHA -512 et on ne garde que les 32 premier bits
+  const hashed = nacl.hash(naclUtil.decodeUTF8(password));
+  return hashed.slice(0,32);
+}
+
+// --- Enregistrement ---
+export function SaveIdentityTolocalStorage(password: string, id:Identity){
+  const serialized = serializeIdentity(id);
+
+  const key = keyFromPassword(password);
+
+  const nonce = nacl.randomBytes(nacl.secretbox.nonceLength);
+  const secretData = JSON.stringify({
+    signPriv: serialized.signPriv,
+    dhPriv: serialized.dhPriv,
+  });
+
+  const encrypted = nacl.secretbox(naclUtil.decodeUTF8(secretData), nonce, key);
+
+  localStorage.setItem(
+    "myIdentity",
+    JSON.stringify({
+      signPub: serialized.signPub,
+      dhPub: serialized.dhPub,
+      priv: b64.enc(encrypted),
+      nonce: b64.enc(nonce),
+    })
+  );
+
+  alert("Votre porte clé a été enregistré de manière sécurisée");
+
+}
+
+export function loadIdentityFromLocalStorage(password:string):Identity{
+  const raw = localStorage.getItem("myIdentity");
+  if(!raw){
+    throw new NoIdentity("Aucun trousseau de clé trouvé en local");
+  }
+
+  const data = JSON.parse(raw);
+
+  const key = keyFromPassword(password);
+
+  const decrypted = nacl.secretbox.open(b64.dec(data.priv), b64.dec(data.nonce), key);
+  if(!decrypted) { 
+    alert("Mauvais mot de passe ou données corrompue");
+    throw new WrongPasswordError("Mauvais mot de passe ou données corrompue");
+  }
+
+  const privData = JSON.parse(naclUtil.encodeUTF8(decrypted));
+
+  return {
+    signPub: b64.dec(data.signPub),
+    signPriv: b64.dec(privData.signPriv),
+    dhPub: b64.dec(data.dhPub),
+    dhPriv: b64.dec(privData.dhPriv),
+  }
+
+
+}
+
+// -- Uint8Array considéreé comme false
+export const isFalsyUint8Array = (arr: Uint8Array | null | undefined): boolean => {
+  return !arr || arr.length === 0;
+};

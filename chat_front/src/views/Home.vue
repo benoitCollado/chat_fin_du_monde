@@ -1,6 +1,6 @@
 <template>
 <h2>
-    Bienvenue dans le jeu
+vos conversations
 </h2>
 </template>
 
