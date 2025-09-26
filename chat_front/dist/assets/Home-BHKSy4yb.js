@@ -1,0 +1,1 @@
+import{d as t,g as a,e as r,b as o,a as i,c as p,o as l,_}from"./index-DXv8NsH5.js";const d=t({__name:"Home",setup(m){return(async()=>{const n=await a(),e=await a(),c=r("Hello Bob !",o.enc(e.dhPub),o.enc(n.signPriv)),s=i(c,o.enc(e.dhPriv));console.log("OK:",s)})(),(n,e)=>(l(),p("h2",null," vos conversations "))}}),u=_(d,[["__scopeId","data-v-c3ac70d8"]]);export{u as default};
