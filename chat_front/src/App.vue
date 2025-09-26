@@ -36,7 +36,6 @@ async function handleLogout(){
   await auth.logout();
   identity.resetIdentyStore();
   await router.push("/login");
-
 }
 
 </script>

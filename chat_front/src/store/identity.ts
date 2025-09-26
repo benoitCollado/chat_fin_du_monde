@@ -2,7 +2,8 @@ import { defineStore } from 'pinia'
 import { ref} from 'vue'
 import { generateIdentity, SaveIdentityTolocalStorage, loadIdentityFromLocalStorage, isFalsyUint8Array} from '../services/crypto';
 import type { Identity } from '../services/crypto';
-import { WrongPasswordError, NoIdentity, IdentityAlreadyExistError } from '../utils.ts/Errors';
+import { WrongPasswordError, NoIdentity, IdentityAlreadyExistError, NoPublicKeyOnServer } from '../utils.ts/Errors';
+import { PutPublicKey, GetMyPublicKey } from '../api/identity';
 
 
 export const useIdentityStore = defineStore('identity', () => {
@@ -13,14 +14,11 @@ export const useIdentityStore = defineStore('identity', () => {
   dhPriv:new Uint8Array(0),});
 
   async function generateKeys(){
-    console.log("gen1");
     const already = alreadHasKeys();
     if(isFalsyUint8Array(identity.value.signPub) && !already){
-        console.log("gen2");
         const id : Identity = await generateIdentity();
-        console.log(id);
-        console.log("gen3");
         identity.value = id;
+        await PutPublicKey(identity.value.signPub, identity.value.dhPub);
     }else{
         throw new IdentityAlreadyExistError("un trousseaux de clé existe déjà");
     }
@@ -55,7 +53,11 @@ export const useIdentityStore = defineStore('identity', () => {
             getKeysLocal();
         } else if (e instanceof WrongPasswordError) {
             alert(e.message);
-        } else if (e instanceof Error) {
+        } 
+        else if (e instanceof NoIdentity){
+            alert(e.message  + " " + e.name);
+        }
+        else if (e instanceof Error) {
             alert(e.message  + " " + e.name);
         } else {
             alert("Une erreur inattendue est survenue");
@@ -63,18 +65,31 @@ export const useIdentityStore = defineStore('identity', () => {
     }
 }
 
-  function getKeysLocal(){
+  async function getKeysLocal(){
     let password = prompt("entrez votre mot de passe pour récupérer");
     password = password || "123"
 
     try{
         identity.value = loadIdentityFromLocalStorage(password);
+        const public_key = await GetMyPublicKey();
+
+        console.log("my keys:", identity.value);
+        console.log("my pub keys sur le serveur", public_key);
     }catch(e){
         if (e instanceof IdentityAlreadyExistError) {
             alert(e.message);
         } else if (e instanceof WrongPasswordError) {
             alert(e.message);
-        } else if (e instanceof Error) {
+        } 
+        else if ( e instanceof NoPublicKeyOnServer){
+            alert("no public key foound on server putng public key on server");
+            await PutPublicKey(identity.value.signPub, identity.value.dhPub);
+            const public_key = await GetMyPublicKey();
+
+        console.log("my keys:", identity.value);
+        console.log("my pub keys sur le serveur", public_key);
+        }
+        else if (e instanceof Error) {
             alert(e.message);
         } else {
             alert("Une erreur inattendue est survenue");

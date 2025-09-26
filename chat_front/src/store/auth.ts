@@ -1,12 +1,18 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { loginUser, registerUser } from '../api/auth'
+import { loginUser, registerUser, getMyInfo } from '../api/auth'
 import { useIdentityStore } from './identity'
+
+interface MyInfo {
+  id: number;
+  username: string;
+}
 
 export const useAuthStore = defineStore('auth', () => {
   // --- State ---
   const access_token = ref<string>("")
   const expiresAt = ref<number>(Date.now())
+  const myInfo = ref<MyInfo>({id:0,username:""})
 
   // --- Getters ---
   const isAuthenticated = computed(() => {
@@ -24,6 +30,12 @@ export const useAuthStore = defineStore('auth', () => {
         const identity = useIdentityStore();
         console.log("on appelle la fonction pour créer ou récupérer les clés");
         identity.saveKeysLocal();
+        const myinfo = await getMyInfo();
+        myInfo.value = {
+          id:myinfo.id,
+          username:myinfo
+        }
+
     }catch{
         console.log("impossible de se connecter");
     }
@@ -52,6 +64,7 @@ export const useAuthStore = defineStore('auth', () => {
     // State
     access_token,
     expiresAt,
+    myInfo,
     // Getters
     isAuthenticated,
     // Actions

@@ -1,10 +1,16 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref} from 'vue'
 import { getUsersAPI} from '../api/users'
+
+export interface UserPubKey{
+    signPub:Uint8Array,
+    dhPub: Uint8Array
+}
 
 export interface User{
     id:number,
     username:string,
+    public_key: UserPubKey | null,
 }
 
 export const useUserStore = defineStore('user', () => {

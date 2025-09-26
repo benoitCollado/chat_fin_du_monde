@@ -1,11 +1,10 @@
 import nacl from "tweetnacl";
 import * as naclUtil from "tweetnacl-util";
-import { hammingEncode, hammingDecode } from "./ECC";
-import { WrongPasswordError, IdentityAlreadyExistError, NoIdentity } from "../utils.ts/Errors";
+import { WrongPasswordError, NoIdentity } from "../utils.ts/Errors";
 
 
 // ---------- Helpers Base64 ----------
-const b64 = {
+export const b64 = {
   enc: (u8: Uint8Array) => naclUtil.encodeBase64(u8),
   dec: (s: string) => naclUtil.decodeBase64(s),
 };
@@ -53,7 +52,7 @@ export function encryptForRecipient(
   const ciphertext = nacl.box.after(naclUtil.decodeUTF8(plaintext), nonce, shared);
 
   // Protection par Hamming
-  const protectedCt = hammingEncode(ciphertext);
+  //const protectedCt = hammingEncode(ciphertext);
 
   const sig = nacl.sign.detached(eph.publicKey, senderSignPriv);
 
@@ -61,33 +60,35 @@ export function encryptForRecipient(
     eph_pub: b64.enc(eph.publicKey),
     sig: b64.enc(sig),
     nonce: b64.enc(nonce),
-    ct: b64.enc(protectedCt),
+    ct: b64.enc(ciphertext),
   };
 }
 
 // ---------- Déchiffrement ----------
 export function decryptFromSender(
   payload: WirePayload,
-  senderSignPub_b64: string,
   myDhPriv_b64: string
 ): string {
   const ephPub = b64.dec(payload.eph_pub);
-  const sig = b64.dec(payload.sig);
   const nonce = b64.dec(payload.nonce);
   const ct_protected = b64.dec(payload.ct);
 
-  const senderSignPub = b64.dec(senderSignPub_b64);
+  //const senderSignPub = b64.dec(senderSignPub_b64);
   const myDhPriv = b64.dec(myDhPriv_b64);
 
-  if (!nacl.sign.detached.verify(ephPub, sig, senderSignPub)) {
+  /*if (!nacl.sign.detached.verify(ephPub, sig, senderSignPub)) {
     throw new Error("Signature invalide : message falsifié.");
-  }
+  }*/
 
-  const ciphertext = hammingDecode(ct_protected);
+  //const ciphertext = hammingDecode(ct_protected);
   const shared = nacl.box.before(ephPub, myDhPriv);
 
-  const plaintext = nacl.box.open.after(ciphertext, nonce, shared);
-  if (!plaintext) throw new Error("Échec du déchiffrement : données corrompues");
+  const plaintext = nacl.box.open.after(ct_protected, nonce, shared);
+
+  if (!plaintext) {
+        throw new Error("Échec du déchiffrement : données corrompues");
+  }
+
 
   return naclUtil.encodeUTF8(plaintext);
 }
@@ -169,3 +170,25 @@ export function loadIdentityFromLocalStorage(password:string):Identity{
 export const isFalsyUint8Array = (arr: Uint8Array | null | undefined): boolean => {
   return !arr || arr.length === 0;
 };
+
+export function sendMessage(
+  plaintext: string,
+  recipientDhPub_b64: Uint8Array,
+  senderIdentity: Identity
+): WirePayload {
+  // Sérialiser la clé privée de signature de l'émetteur
+  const senderSignPriv_b64 = b64.enc(senderIdentity.signPriv);
+  const recipientDhPub_b64s = b64.enc(recipientDhPub_b64); 
+
+  // Chiffrement pour le destinataire
+  const payload = encryptForRecipient(
+    plaintext,
+    recipientDhPub_b64s,
+    senderSignPriv_b64
+  );
+
+  // ajouter une vérification que la clé sign du destinataire
+  // correspond bien à celle attendue, si tu as un répertoire de confiance.
+
+  return payload;
+}

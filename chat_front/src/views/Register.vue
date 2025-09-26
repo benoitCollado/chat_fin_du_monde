@@ -32,7 +32,7 @@ async function handleRegister() {
     return;
   }
   try{
-    const res = await registerUser(username.value, password.value);
+    await registerUser(username.value, password.value);
     alert('Compte créé, vous pouvez vous connecter');
     router.push('/login');
   }catch{

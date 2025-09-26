@@ -1,7 +1,9 @@
-// Tu remplaceras par des appels réels avec fetch ou axios
+import { useAuthStore } from "../store/auth";
+import {url} from "../variables/variables";
+
 export async function loginUser(username: string, password: string) {
 
-      const res = await fetch("http://localhost:8000/auth/login", {
+      const res = await fetch(url+"auth/login", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -23,7 +25,7 @@ export async function loginUser(username: string, password: string) {
 }
 
 export async function registerUser(username: string, password:string){
-    const res = await fetch("http://localhost:8000/auth/register", {
+    const res = await fetch(url+"auth/register", {
         method:"POST",
          headers: {
             "Content-Type": "application/json" // ✅ indique que c'est du JSON
@@ -41,4 +43,21 @@ export async function registerUser(username: string, password:string){
     return {
         status: res.status
     }
+}
+
+export async function getMyInfo(){
+     const auth = useAuthStore();
+    const res = await fetch(url+"auth/me", {
+        method:"GET",
+         headers: {
+            "Authorization": "Bearer "+ auth.access_token,
+            "Content-Type": "application/json" 
+        }
+    });
+
+    if(!res.ok){
+        throw new Error("Echec de la connexion");
+    }
+
+    return await res.json();
 }

@@ -18,3 +18,10 @@ export class NoIdentity extends Error {
     this.name = "NoIdentity";
   }
 }
+
+export class NoPublicKeyOnServer extends Error {
+  constructor(message = "No public key found on server") {
+    super(message);
+    this.name = "NoPublicKeyOnServer";
+  }
+}

@@ -1,17 +1,19 @@
 <script setup lang="ts">
-    import { ref, onMounted } from 'vue';
+    import { onMounted } from 'vue';
     import { useUserStore} from '../store/users';
-    import type { User } from '../store/users';
     const users = useUserStore();
-    console.log(users.users);
-    const userList = ref<User[]>([]);
     onMounted(async() => {
         await users.getUsers();
     })
 </script>
 
 <template>
-    <p v-for="user in users.users" :key="user.id">
-        {{user.username }}
-    </p>
+    <h3>
+        users
+    </h3>
+    <div v-for="user in users.users" :key="user.id">
+        <p>{{user.username }}</p>
+        <p>{{user.id }}</p>
+        <p v-if="user.public_key !== null">{{JSON.stringify(user.public_key) }}</p>
+    </div>
 </template>
