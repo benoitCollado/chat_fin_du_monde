@@ -57,6 +57,10 @@ export async function getMyInfo(){
 
     if(!res.ok){
         throw new Error("Echec de la connexion");
+
+
+
+        
     }
 
     return await res.json();
