@@ -1,0 +1,77 @@
+/* ===== 🎨 Global Styles ===== */
+:root {
+  --primary-color: #2563eb;
+  --secondary-color: #f3f4f6;
+  --text-color: #111827;
+  --text-light: #6b7280;
+  --border-radius: 0.75rem;
+  --transition: 0.2s ease-in-out;
+  font-family: 'Inter', 'Roboto', sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--secondary-color);
+  color: var(--text-color);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* ===== 🏗️ Layout ===== */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+/* ===== 🧭 Navigation ===== */
+header {
+  background: var(--primary-color);
+  color: white;
+  padding: 1rem 2rem;
+  border-bottom: 3px solid rgba(0, 0, 0, 0.1);
+}
+
+nav a {
+  color: white;
+  text-decoration: none;
+  margin-right: 1rem;
+  transition: var(--transition);
+}
+
+nav a:hover {
+  text-decoration: underline;
+}
+
+/* ===== 📦 Cards ===== */
+.card {
+  background: white;
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  padding: 1rem;
+  margin: 1rem 0;
+  transition: var(--transition);
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== 🎛️ Buttons ===== */
+button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+button:hover {
+  background-color: #1e40af;
+  transform: scale(1.02);
+}
