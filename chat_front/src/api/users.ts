@@ -16,7 +16,7 @@ export interface UserPubKey{
 
 export async function getUsersAPI(){
     const auth = useAuthStore();
-    const res = await fetch(url+"users/annuaire?only_with_key=true", {
+    const res = await fetch(url+"users/annuaire", {
         method:"GET",
         headers:{
             "Authorization": "Bearer "+ auth.access_token,
